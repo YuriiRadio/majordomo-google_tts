@@ -216,7 +216,7 @@ class google_tts extends module {
      * @access private
      */
     function install($data = '') {
-        subscribeToEvent($this->name, 'SAY', '', 666);
+        subscribeToEvent($this->name, 'SAY', '', 777);
         parent::install();
     }
 
