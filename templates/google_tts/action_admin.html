@@ -1,0 +1,29 @@
+[#if VIEW_MODE="search_google_tts" || VIEW_MODE=""#]
+
+[#if OK#]
+   <div class="alert alert-success"><#LANG_DATA_SAVED#></div>
+[#endif OK#]
+
+ 
+<!-- table zwave_devices search -->
+<div id="api_settings">
+   <form action="?" method="post" enctype="multipart/form-data" name="frmEdit" class="form-horizontal">
+      <fieldset>
+         <div class="form-group">
+            <label class="control-label"><#LANG_VALUE#>: (*)</label>
+            <div class="col-lg-6">
+               <input type="radio" name="disabled" value="0" [#if DISABLED!="1"#] checked[#endif#]><#LANG_ON#>
+               <input type="radio" name="disabled" value="1" [#if DISABLED=="1"#] checked[#endif#]><#LANG_OFF#>
+            </div>
+         </div>
+
+         <div class="form-actions">
+            <button type="submit" name="subm" value="Submit" class="btn btn-primary"><#LANG_UPDATE#></button>
+            <input type="hidden" name="view_mode" value="update_settings">
+            <input type="hidden" name="mode" value="update">
+         </div>
+      </fieldset>
+   </form>
+   <div class="pull-left"><a href="?cache_clear=1" class="btn btn-default">Clear mp3 cache</a></div>
+</div>
+[#endif VIEW_MODE#]
