@@ -155,7 +155,6 @@ class google_tts extends module {
     function processSubscription($event, &$details) {
         $this->getConfig();
         if ($event == 'SAY' && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
-            //DebMes($details);
             $level = $details['level'];
             $message = $details['message'];
 
@@ -185,7 +184,6 @@ class google_tts extends module {
                         //'speaker' => $speaker,
                         //'key' => $accessKey,
                     ]);
-                    //DebMes($base_url . $qs);
 
                     try {
                         $contents = file_get_contents($base_url . $qs);
