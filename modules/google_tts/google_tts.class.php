@@ -154,22 +154,22 @@ class google_tts extends module {
 
     function processSubscription($event, &$details) {
         $this->getConfig();
-        if ($event == 'SAY' && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
-            $level = $details['level'];
-            $message = $details['message'];
 
-            // $accessKey = $this->config['ACCESS_KEY'];
-            // $speaker = $this->config['SPEAKER'];
 
-            if ($level >= (int) getGlobal('minMsgLevel')) {
-                $filename = md5($message) . '_google.mp3';
+      if ($details['SOURCE']) {
+            if (($event == 'SAY' OR $event == 'SAYTO' OR $event == 'SAYREPLY') AND !$this->config['DISABLED']) {
+                DebMes("Processing $event: " . json_encode($details, JSON_UNESCAPED_UNICODE), 'terminals');
+                $message                    = $details['MESSAGE'];
+                $level                      = $details['IMPORTANCE'];
+                $mmd5                       = md5($message);
+                $cached_filename            = ROOT . 'cms/cached/voice/sapi_' . $mmd5 . '.mp3';
                 $cachedVoiceDir = ROOT . 'cms/cached/voice';
-                $cachedFileName = $cachedVoiceDir . '/' . $filename;
-
+                $details['CACHED_FILENAME'] = $cached_filename;
+                $details['tts_engine']      = 'google_tts';
+                
                 $base_url = 'https://translate.google.com/translate_tts?';
 
-                if (!file_exists($cachedFileName)) {
-
+               if (!file_exists($cached_filename)) {
                     $lang = SETTINGS_SITE_LANGUAGE;
                     if ($lang == 'ua') {
                         $lang = 'uk';
@@ -193,16 +193,15 @@ class google_tts extends module {
 
                     if (isset($contents)) {
                         CreateDir($cachedVoiceDir);
-                        SaveFile($cachedFileName, $contents);
+                        SaveFile($cached_filename, $contents);
+                        processSubscriptions('SAY_CACHED_READY', $details);
                     }
                 } else {
-                    @touch($cachedFileName);
+                    processSubscriptions('SAY_CACHED_READY', $details);
                 }
-                if (file_exists($cachedFileName)) {
-                    playSound($cachedFileName, 1, $level);
-                    $details['ignoreVoice'] = 1;
-                }
+                $details['BREAK'] = true;
             }
+            return true;
         }
     }
 
@@ -214,7 +213,10 @@ class google_tts extends module {
      * @access private
      */
     function install($data = '') {
-        subscribeToEvent($this->name, 'SAY', '', 777);
+        subscribeToEvent($this->name, 'SAY', '', 100);
+        subscribeToEvent($this->name, 'SAYTO', '', 100);
+        subscribeToEvent($this->name, 'ASK', '', 100);
+        subscribeToEvent($this->name, 'SAYREPLY', '', 100);
         parent::install();
     }
 
