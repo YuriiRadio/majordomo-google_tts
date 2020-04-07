@@ -203,6 +203,58 @@ class google_tts extends module {
             }
             return true;
         }
+        if ($event == 'SAY' && !$this->config['DISABLED'] && !$details['ignoreVoice']) {
+            //DebMes($details);
+            $level = $details['level'];
+            $message = $details['message'];
+
+            // $accessKey = $this->config['ACCESS_KEY'];
+            // $speaker = $this->config['SPEAKER'];
+
+            if ($level >= (int) getGlobal('minMsgLevel')) {
+                $filename = md5($message) . '_google.mp3';
+                $cachedVoiceDir = ROOT . 'cms/cached/voice';
+                $cachedFileName = $cachedVoiceDir . '/' . $filename;
+
+                $base_url = 'https://translate.google.com/translate_tts?';
+
+                if (!file_exists($cachedFileName)) {
+
+                    $lang = SETTINGS_SITE_LANGUAGE;
+                    if ($lang == 'ua') {
+                        $lang = 'uk';
+                    }
+
+                    $qs = http_build_query([
+                        'ie' => 'UTF-8',
+                        'client' => 'tw-ob',
+                        'q' => $message,
+                        'tl' => $lang,
+                        //'ttsspeed' => 1 // 0-4
+                        //'speaker' => $speaker,
+                        //'key' => $accessKey,
+                    ]);
+                    //DebMes($base_url . $qs);
+
+                    try {
+                        $contents = file_get_contents($base_url . $qs);
+                    } catch (Exception $e) {
+                        registerError('google_tts', get_class($e) . ', ' . $e->getMessage());
+                    }
+
+                    if (isset($contents)) {
+                        CreateDir($cachedVoiceDir);
+                        SaveFile($cachedFileName, $contents);
+                    }
+                } else {
+                    @touch($cachedFileName);
+                }
+                if (file_exists($cachedFileName)) {
+                    playSound($cachedFileName, 1, $level);
+                    $details['ignoreVoice'] = 1;
+                }
+            }
+        }
     }
 
     /**
