@@ -20,7 +20,7 @@ class google_tts extends module {
      * @access private
      */
     function google_tts() {
-        $this->name = "google_tts";
+        $this->name = "google_tts_seample";
         $this->title = "Google TTS";
         $this->module_category = "<#LANG_SECTION_APPLICATIONS#>";
         $this->checkInstalled();
