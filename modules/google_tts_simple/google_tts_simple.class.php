@@ -10,7 +10,7 @@
  */
 //
 //
-class google_tts extends module {
+class google_tts_simple extends module {
 
     /**
      * google_tts
