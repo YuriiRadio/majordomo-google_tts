@@ -224,8 +224,6 @@ class google_tts_simple extends module
                 
                 $base_url = 'https://translate.google.com/translate_tts?';
                 
-                if (!file_exists($cachedFileName)) {
-                    
                 if (!file_exists($cached_filename)) {
                     
                     $query = array(
