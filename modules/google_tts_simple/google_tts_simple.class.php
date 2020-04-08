@@ -20,7 +20,7 @@ class google_tts_simple extends module {
      * @access private
      */
     function __construct()  {
-        $this->name = "google_tts_sіmple";
+        $this->name = "google_tts_simple";
         $this->title = "Google TTS Sіmple";
         $this->module_category = "<#LANG_SECTION_APPLICATIONS#>";
         $this->checkInstalled();
