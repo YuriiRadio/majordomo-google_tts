@@ -12,7 +12,7 @@
 //
 class google_tts_simple extends module
 {
-    
+
     /**
      * google_tts
      *
@@ -27,7 +27,7 @@ class google_tts_simple extends module
         $this->module_category = "<#LANG_SECTION_APPLICATIONS#>";
         $this->checkInstalled();
     }
-    
+
     /**
      * saveParams
      *
@@ -52,7 +52,7 @@ class google_tts_simple extends module
         }
         return parent::saveParams($p);
     }
-    
+
     /**
      * getParams
      *
@@ -83,7 +83,7 @@ class google_tts_simple extends module
             $this->tab = $tab;
         }
     }
-    
+
     /**
      * Run
      *
@@ -114,7 +114,7 @@ class google_tts_simple extends module
         $p                = new parser(DIR_TEMPLATES . $this->name . "/" . $this->name . ".html", $this->data, $this);
         $this->result     = $p->result;
     }
-    
+
     /**
      * BackEnd
      *
@@ -126,27 +126,27 @@ class google_tts_simple extends module
     {
         $this->getConfig();
         $out['DISABLED'] = $this->config['DISABLED'];
-        
+
         if ($this->view_mode == 'update_settings') {
             global $disabled;
             $this->config['DISABLED'] = $disabled;
             $this->saveConfig();
-            
+
             subscribeToEvent($this->name, 'SAY');
             $this->redirect("?ok=1");
         }
-        
+
         if ($_GET['ok']) {
             $out['OK'] = 1;
         }
-        
+
         global $cache_clear;
         if ($cache_clear) {
             array_map("unlink", glob(ROOT . "cms/cached/voice/*_google.mp3"));
             $this->redirect("?ok=1");
         }
     }
-    
+
     /**
      * FrontEnd
      *
@@ -158,13 +158,13 @@ class google_tts_simple extends module
     {
         $this->admin($out);
     }
-    
+
     function processSubscription($event, &$details)
     {
         $this->getConfig();
         if ($this->config['DISABLED'])
             return;
-        
+
         if ($details['SOURCE']) {
             if (($event == 'SAY' OR $event == 'SAYTO' OR $event == 'SAYREPLY') AND !$this->config['DISABLED']) {
                 DebMes("Processing $event: " . json_encode($details, JSON_UNESCAPED_UNICODE), 'terminals');
@@ -175,11 +175,11 @@ class google_tts_simple extends module
                 $cachedVoiceDir             = ROOT . 'cms/cached/voice';
                 $details['CACHED_FILENAME'] = $cached_filename;
                 $details['tts_engine']      = 'google_tts';
-                
+
                 $base_url = 'https://translate.google.com/translate_tts?';
-                
+
                 if (!file_exists($cached_filename)) {
-                    
+
                     $query = array(
                         'ie' => 'UTF-8',
                         'client' => 'tw-ob',
@@ -190,13 +190,13 @@ class google_tts_simple extends module
                         //'key' => $accessKey,
                     );
                     $qs    = http_build_query($query);
-                    
+
                     try {
                         $contents = file_get_contents($base_url . $qs);
                     } catch (Exception $e) {
                         registerError('google_tts', get_class($e) . ', ' . $e->getMessage());
                     }
-                    
+
                     if (isset($contents)) {
                         CreateDir($cachedVoiceDir);
                         SaveFile($cached_filename, $contents);
@@ -213,19 +213,19 @@ class google_tts_simple extends module
             //DebMes($details);
             $level   = $details['level'];
             $message = $details['message'];
-            
+
             // $accessKey = $this->config['ACCESS_KEY'];
             // $speaker = $this->config['SPEAKER'];
-            
+
             if ($level >= (int) getGlobal('minMsgLevel')) {
                 $filename       = md5($message) . '_google.mp3';
                 $cachedVoiceDir = ROOT . 'cms/cached/voice';
                 $cachedFileName = $cachedVoiceDir . '/' . $filename;
-                
+
                 $base_url = 'https://translate.google.com/translate_tts?';
-                
-                if (!file_exists($cached_filename)) {
-                    
+
+                if (!file_exists($cachedFileName) && filesize($cachedFileName)) {
+
                     $query = array(
                         'ie' => 'UTF-8',
                         'client' => 'tw-ob',
@@ -235,17 +235,17 @@ class google_tts_simple extends module
                         //'speaker' => $speaker,
                         //'key' => $accessKey,
                     );
-					
-                    $qs    = http_build_query($query);
-                    
-                    
+
+                    $qs = http_build_query($query);
+
+
                     try {
                         $contents = file_get_contents($base_url . $qs);
                     }
                     catch (Exception $e) {
                         registerError('google_tts', get_class($e) . ', ' . $e->getMessage());
                     }
-                    
+
                     if (isset($contents)) {
                         CreateDir($cachedVoiceDir);
                         SaveFile($cachedFileName, $contents);
@@ -260,7 +260,7 @@ class google_tts_simple extends module
             }
         }
     }
-    
+
     /**
      * Install
      *
@@ -275,7 +275,7 @@ class google_tts_simple extends module
         subscribeToEvent($this->name, 'SAYREPLY', '', 100);
         parent::install();
     }
-    
+
     /**
      * Uninstall
      */
@@ -288,5 +288,5 @@ class google_tts_simple extends module
 
         parent::uninstall();
     }
-    
+
 }
